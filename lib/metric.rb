@@ -25,20 +25,30 @@ class Metric
 
   private
   def self.get_metrics_list(prefix = Graphiti.settings.metric_prefix)
-    url = "#{Graphiti.settings.graphite_base_url}/metrics/index.json"
-    puts "Getting #{url}"
-    response = Typhoeus::Request.get(url)
-    if response.success?
-      json = Yajl::Parser.parse(response.body)
-      if prefix.nil?
-        @metrics = json 
-      elsif prefix.kind_of?(Array)
-        @metrics = json.grep(/^[#{prefix.map! { |k| Regexp.escape k }.join("|")}]/)
-      else
-        @metrics = json.grep(/^#{Regexp.escape prefix}/)
-      end
+    urls = []
+    @metrics = []
+    puts "#{Graphiti.settings.graphite_caches.length}"
+    if Graphiti.settings.graphite_caches.length <= 0
+      urls << Graphiti.settings.graphite_base_url
     else
-      puts "Error fetching #{url}. #{response.inspect}"
+      urls.concat(Graphiti.settings.graphite_caches)
+    end
+    urls.each do |u|
+      url = "#{u}/metrics/index.json"
+      puts "Getting #{url}"
+      response = Typhoeus::Request.get(url)
+      if response.success?
+        json = Yajl::Parser.parse(response.body)
+        if prefix.nil?
+          @metrics.concat(json)
+        elsif prefix.kind_of?(Array)
+          @metrics.concat(json.grep(/^[#{prefix.map! { |k| Regexp.escape k }.join("|")}]/))
+        else
+          @metrics.concat(json.grep(/^#{Regexp.escape prefix}/))
+        end
+      else
+        puts "Error fetching #{url}. #{response.inspect}"
+      end
     end
     @metrics.sort
   end
