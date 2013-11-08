@@ -27,7 +27,6 @@ class Metric
   def self.get_metrics_list(prefix = Graphiti.settings.metric_prefix)
     urls = []
     @metrics = []
-    puts "#{Graphiti.settings.graphite_caches.length}"
     if Graphiti.settings.graphite_caches.length <= 0
       urls << Graphiti.settings.graphite_base_url
     else
