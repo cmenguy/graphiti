@@ -2,7 +2,14 @@
 graphiti_base_url: http://graphiti.pp.local
 graphite_base_url: http://graphite01.pp.local
 #graphite_base_url: https://user:pass@graphite01.pp.local
-graphite_caches: []
+
+# if multiple Graphite caches the index.json needs to be fetched
+# from every one of them and merged
+graphite_caches:
+  - http://graphite01.pp.local
+  - http://graphite02.pp.local
+  - http://graphite03.pp.local
+
 redis_url: localhost:6379:1/graphiti
 tmp_dir: /tmp
 fonts:
